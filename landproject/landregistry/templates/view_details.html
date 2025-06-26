@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Land Registry Search</title>
+
+  <!-- CSS -->
+  <style>
+    body {
+      background: #f5f7fa;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+    input[type="text"], select {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+    button:hover {
+      background-color: #005bb5;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #f0f0f0;
+      white-space: pre-wrap;
+    }
+    .loading {
+      color: orange;
+      font-weight: bold;
+    }
+  </style>
+
+  <!-- jsPDF for PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- SheetJS for Excel export -->
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h2>Search Land Parcel</h2>
+
+    <input id="plotIdInput" type="text" placeholder="Enter Plot ID e.g., PLOT-345">
+    <button onclick="searchByPlotId()">Search by Plot ID</button>
+
+    <input id="ownerNameInput" type="text" placeholder="Or Enter Owner Name">
+    <button onclick="searchByOwnerName()">Search by Owner Name</button>
+
+    <select id="formatSelect" style="display:none;">
+      <option value="pdf">Download as PDF</option>
+      <option value="excel">Download as Excel</option>
+      <option value="word">Download as Word</option>
+    </select>
+    <button id="downloadBtn" style="display:none;" onclick="downloadData()">Download Info</button>
+
+    <div id="result" class="result"></div>
+  </div>
+  <br><br><br><br> <br><br><br><br>
+{% include 'footer.html' %}
+  <script>
+    let currentLandData = null;
+
+    async function searchByPlotId() {
+      const plotId = document.getElementById('plotIdInput').value.trim();
+      const resultDiv = document.getElementById('result');
+      const downloadBtn = document.getElementById('downloadBtn');
+      const formatSelect = document.getElementById('formatSelect');
+      downloadBtn.style.display = 'none';
+      formatSelect.style.display = 'none';
+      resultDiv.innerHTML = '<div class="loading">Fetching data...</div>';
+
+      if (!plotId) {
+        resultDiv.innerHTML = '<b style="color: red">Please enter a Plot ID.</b>';
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/land/${encodeURIComponent(plotId)}/`);
+        const data = await response.json();
+
+        if (data.error) {
+          resultDiv.innerHTML = '<b style="color: red">' + data.error + '</b>';
+          currentLandData = null;
+        } else {
+          currentLandData = data;
+          resultDiv.innerHTML = `
+            <h4>Land Details:</h4>
+            <p><strong>Plot ID:</strong> ${data.plotId}</p>
+            <p><strong>Owner:</strong> ${data.ownerName}</p>
+            <p><strong>District:</strong> ${data.district}</p>
+            <p><strong>Subcounty:</strong> ${data.subcounty}</p>
+            <p><strong>Village:</strong> ${data.village}</p>
+            <p><strong>Plot Size:</strong> ${data.plotSize} sqm</p>
+            <p><strong>National NIN:</strong> ${data.nationalNIN}</p>
+            <p><strong>Leased:</strong> ${data.isLeased ? 'Yes' : 'No'}</p>
+          `;
+          downloadBtn.style.display = 'inline-block';
+          formatSelect.style.display = 'inline-block';
+        }
+      } catch (err) {
+        resultDiv.innerHTML = '<b style="color: red">Error fetching data.</b>';
+        currentLandData = null;
+      }
+    }
+
+    async function searchByOwnerName() {
+      const ownerName = document.getElementById('ownerNameInput').value.trim();
+      const resultDiv = document.getElementById('result');
+      const downloadBtn = document.getElementById('downloadBtn');
+      const formatSelect = document.getElementById('formatSelect');
+      downloadBtn.style.display = 'none';
+      formatSelect.style.display = 'none';
+
+      if (!ownerName) {
+        resultDiv.innerHTML = '<b style="color: red">Please enter an Owner Name.</b>';
+        return;
+      }
+
+      resultDiv.innerHTML = '<div class="loading">Searching plots...</div>';
+
+      try {
+        const response = await fetch(`/api/search-owner/${encodeURIComponent(ownerName)}/`);
+        const data = await response.json();
+
+        if (!data.matchingPlotIds || data.matchingPlotIds.length === 0) {
+          resultDiv.innerHTML = '<b>No plots found for this owner name.</b>';
+          currentLandData = null;
+        } else {
+          resultDiv.innerHTML = `<b>Plot IDs:</b> ${data.matchingPlotIds.join(', ')}`;
+          // For search by owner name, no detailed info or download available
+          currentLandData = null;
+        }
+      } catch (err) {
+        resultDiv.innerHTML = '<b style="color: red">Error fetching data.</b>';
+        currentLandData = null;
+      }
+    }
+
+    function downloadData() {
+      if (!currentLandData) {
+        alert("No data to download.");
+        return;
+      }
+
+      const format = document.getElementById('formatSelect').value;
+
+      if (format === 'pdf') {
+        downloadPDF(currentLandData);
+      } else if (format === 'excel') {
+        downloadExcel(currentLandData);
+      } else if (format === 'word') {
+        downloadWord(currentLandData);
+      }
+    }
+
+    // PDF Download using jsPDF
+    function downloadPDF(data) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.setFontSize(16);
+      doc.text("Land Parcel Details", 10, 20);
+      doc.setFontSize(12);
+      let y = 30;
+
+      for (const [key, value] of Object.entries(data)) {
+        let text = `${key}: ${value}`;
+        // jsPDF max width handling
+        const splitText = doc.splitTextToSize(text, 180);
+        doc.text(splitText, 10, y);
+        y += splitText.length * 10;
+      }
+
+      doc.save(`${data.plotId}_details.pdf`);
+    }
+
+    // Excel download using SheetJS
+    function downloadExcel(data) {
+      const ws = XLSX.utils.json_to_sheet([data]);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "LandDetails");
+      XLSX.writeFile(wb, `${data.plotId}_details.xlsx`);
+    }
+
+    // Word download (simple text file with .doc extension)
+    function downloadWord(data) {
+      let content = "Land Parcel Details\n\n";
+      for (const [key, value] of Object.entries(data)) {
+        content += `${key}: ${value}\n`;
+      }
+      const blob = new Blob([content], { type: "application/msword" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `${data.plotId}_details.doc`;
+      link.click();
+    }
+  </script>
+</body>
+</html>

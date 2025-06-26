@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Land Registry on Blockchain</title>
+  <link rel="icon" href="/favicon.ico">
+
+  <style>
+    /* Reset & base styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f5f7fa;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    header {
+      background-color: #fff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    .logo span {
+      color: #3498db;
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      flex-wrap: wrap;
+    }
+
+    nav ul li {
+      position: relative;
+      margin-left: 1.5rem;
+    }
+
+    nav ul li a {
+      text-decoration: none;
+      color: #2c3e50;
+      font-weight: 500;
+      transition: color 0.3s;
+      cursor: pointer;
+    }
+
+    nav ul li a:hover {
+      color: #3498db;
+    }
+
+    /* Dropdown menu */
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 40px;
+      left: 0;
+      background: white;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-radius: 6px;
+      z-index: 1000;
+      min-width: 180px;
+    }
+
+    .dropdown-menu li a {
+      display: block;
+      padding: 10px 20px;
+      color: #2c3e50;
+      text-decoration: none;
+    }
+
+    .dropdown-menu li a:hover {
+      background: #f0f0f0;
+    }
+
+    .dropdown:hover .dropdown-menu {
+      display: block;
+    }
+
+    /* Main content container */
+    main {
+      margin-top: 80px; /* Account for fixed header */
+    }
+
+    /* Hero Section */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 5rem 2rem;
+      background: linear-gradient(135deg, #3498db, #2c3e50);
+      color: white;
+      min-height: 70vh;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin-bottom: 2rem;
+    }
+
+    /* About Section */
+    .about {
+      padding: 5rem 2rem;
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      text-align: center;
+    }
+
+    .about-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .about h2 {
+      font-size: 2.5rem;
+      color: #2c3e50;
+      margin-bottom: 2rem;
+      font-weight: 700;
+    }
+
+    .about-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 3rem;
+      margin-top: 3rem;
+    }
+
+    .about-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .about-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .about-card h3 {
+      color: #3498db;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .about-card p {
+      color: #666;
+      line-height: 1.7;
+    }
+
+    .about-intro {
+      font-size: 1.2rem;
+      color: #555;
+      max-width: 800px;
+      margin: 0 auto 2rem;
+      line-height: 1.8;
+    }
+
+    /* Contact Section */
+    .contact {
+      padding: 5rem 2rem;
+      background: linear-gradient(135deg, #2c3e50, #34495e);
+      color: white;
+      text-align: center;
+    }
+
+    .contact-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .contact h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+
+    .contact-intro {
+      font-size: 1.2rem;
+      margin-bottom: 3rem;
+      opacity: 0.9;
+    }
+
+    .contact-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .contact-card {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2rem;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    .contact-card:hover {
+      transform: scale(1.05);
+    }
+
+    .contact-card h3 {
+      color: #3498db;
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+    }
+
+    .contact-card p, .contact-card a {
+      color: white;
+      text-decoration: none;
+      line-height: 1.6;
+    }
+
+    .contact-card a:hover {
+      color: #3498db;
+    }
+
+    .contact-form {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2rem;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      margin-top: 3rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: white;
+      font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-family: inherit;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #3498db;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* Buttons */
+    .btn-connect {
+      padding: 0.75rem 1.5rem;
+      background-color: #5f00b8;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin: 0.5rem;
+      min-width: 150px;
+    }
+
+    .btn-connect:hover {
+      background-color: #440087;
+    }
+
+    .btn-submit {
+      padding: 0.75rem 2rem;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+      width: 100%;
+    }
+
+    .btn-submit:hover {
+      background-color: #2980b9;
+    }
+
+    #disconnectBtn {
+      background-color: #e74c3c;
+    }
+
+    #disconnectBtn:hover {
+      background-color: #c0392b;
+    }
+
+    /* Status messages */
+    .status {
+      margin-top: 1rem;
+      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.75rem 1.5rem;
+      border-radius: 20px;
+      min-width: 300px;
+      word-wrap: break-word;
+      user-select: text;
+    }
+
+    /* Role-based menu item hidden by default */
+    .role-admin, .role-landowner {
+      display: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem;
+      }
+
+      nav ul {
+        flex-direction: column;
+        width: 100%;
+        margin-top: 1rem;
+      }
+
+      nav ul li {
+        margin: 0.5rem 0;
+      }
+
+      .hero h1 {
+        font-size: 2rem;
+      }
+
+      .about h2, .contact h2 {
+        font-size: 2rem;
+      }
+
+      .about-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .contact-content {
+        grid-template-columns: 1fr;
+      }
+
+      .btn-connect, #disconnectBtn {
+        width: 100%;
+        min-width: unset;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Land <span>Registry</span></div>
+  <nav>
+    <ul id="navMenu">
+      <li><a href="#home">Home</a></li>
+      <li class="dropdown role-landowner role-admin">
+        <a href="#">Managing Land</a>
+        <ul class="dropdown-menu">
+          <li><a href="{% url 'register_land' %}">Register Land</a></li>
+          <li><a href="{% url 'transfer_land' %}">Transfer Land</a></li>
+          <li><a href="{% url 'lease_land' %}">Lease Land</a></li>
+          <li><a href="{% url 'view_details' %}">View Records</a></li>
+        </ul>
+      </li>
+      <li class="role-landowner"><a href="{% url 'split_land' %}">Split Land</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+  <section id="home" class="hero">
+    <h1>Land Registry on Blockchain</h1>
+    <p>Secure, transparent, and immutable land ownership records powered by blockchain technology</p>
+
+    <button class="btn-connect" id="connectBtn">Connect to MetaMask</button>
+    <button class="btn-connect" id="disconnectBtn" style="display:none;">Disconnect Wallet</button>
+
+    <div class="status" id="walletStatus">Not connected</div>
+    <div class="status" id="roleStatus" style="display:none;">Role: Unknown</div>
+  </section>
+
+  <section id="about" class="about">
+    <div class="about-container">
+      <h2>About Our Platform</h2>
+      <p class="about-intro">
+        Our blockchain-based land registry system revolutionizes property ownership verification and management. 
+        By leveraging cutting-edge blockchain technology, we provide an immutable, transparent, and secure 
+        platform for land registration, transfer, and management that eliminates fraud and reduces bureaucratic delays.
+      </p>
+      
+      <div class="about-content">
+        <div class="about-card">
+          <h3>🔒 Unmatched Security</h3>
+          <p>
+            Built on blockchain technology, our platform ensures that all land records are cryptographically secured 
+            and tamper-proof. Every transaction is permanently recorded and verified by the network, making fraud 
+            virtually impossible.
+          </p>
+        </div>
+        
+        <div class="about-card">
+          <h3>🌍 Complete Transparency</h3>
+          <p>
+            All land transactions and ownership records are publicly verifiable on the blockchain while maintaining 
+            privacy where needed. This transparency builds trust and reduces disputes between parties.
+          </p>
+        </div>
+        
+        <div class="about-card">
+          <h3>⚡ Instant Verification</h3>
+          <p>
+            No more waiting weeks for property verification. Our smart contracts enable instant verification of 
+            ownership, transfer history, and legal status of any registered property.
+          </p>
+        </div>
+        
+        <div class="about-card">
+          <h3>📊 Smart Contracts</h3>
+          <p>
+            Automated processes through smart contracts reduce human error and eliminate the need for intermediaries. 
+            Transfers, leases, and splits are executed automatically when conditions are met.
+          </p>
+        </div>
+        
+        <div class="about-card">
+          <h3>🌐 Global Accessibility</h3>
+          <p>
+            Access your land records from anywhere in the world, 24/7. Our decentralized system ensures your 
+            property information is always available when you need it.
+          </p>
+        </div>
+        
+        <div class="about-card">
+          <h3>💡 Future-Ready</h3>
+          <p>
+            Built for the digital age, our platform integrates seamlessly with modern financial systems and 
+            is designed to evolve with emerging technologies and regulations.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="contact">
+    <div class="contact-container">
+      <h2>Get In Touch</h2>
+      <p class="contact-intro">
+        Have questions about our blockchain land registry system? Need support with your property transactions? 
+        We're here to help you navigate the future of land ownership.
+      </p>
+      
+      <div class="contact-content">
+        <div class="contact-card">
+          <h3>📍 Office Location</h3>
+          <p>
+            Blockchain Land Registry<br>
+            Innovation Hub, Tech District<br>
+            Kampala, Uganda<br>
+            East Africa
+          </p>
+        </div>
+        
+        <div class="contact-card">
+          <h3>📞 Phone Support</h3>
+          <p>
+            Main Office: +256 700 123 456<br>
+            Technical Support: +256 700 123 457<br>
+            Emergency Line: +256 700 123 458
+          </p>
+        </div>
+        
+        <div class="contact-card">
+          <h3>✉️ Email Us</h3>
+          <p>
+            General Inquiries:<br>
+            <a href="mailto:info@landregistry.blockchain">info@landregistry.blockchain</a><br><br>
+            Technical Support:<br>
+            <a href="mailto:support@landregistry.blockchain">support@landregistry.blockchain</a>
+          </p>
+        </div>
+        
+        <div class="contact-card">
+          <h3>🕒 Business Hours</h3>
+          <p>
+            Monday - Friday: 8:00 AM - 6:00 PM<br>
+            Saturday: 9:00 AM - 4:00 PM<br>
+            Sunday: Closed<br>
+            Emergency Support: 24/7
+          </p>
+        </div>
+      </div>
+
+      <form class="contact-form" id="contactForm">
+        <h3 style="margin-bottom: 1.5rem; color: #3498db;">Send us a Message</h3>
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+        </div>
+        <div class="form-group">
+          <label for="subject">Subject</label>
+          <input type="text" id="subject" name="subject" placeholder="What is this regarding?" required>
+        </div>
+        <div class="form-group">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" rows="5" placeholder="Tell us how we can help you..." required></textarea>
+        </div>
+        <button type="submit" class="btn-submit">Send Message</button>
+      </form>
+    </div>
+  </section>
+</main>
+{% include 'footer.html' %}
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<script>
+ const connectBtn = document.getElementById('connectBtn');
+const disconnectBtn = document.getElementById('disconnectBtn');
+const walletStatus = document.getElementById('walletStatus');
+const roleStatus = document.getElementById('roleStatus');
+const navMenu = document.getElementById('navMenu');
+
+let currentAccount;
+let provider;
+let signer;
+let contract;
+
+// Your deployed contract address
+const CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+
+// Minimal ABI with registerLand function only (add others as needed)
+const ABI = [
+  "function registerLand(string plotId, string ownerName, string district, string subcounty, string parish, string village, uint256 plotSize, string nationalNIN) payable"
+];
+
+async function connectMetaMask() {
+  if (!window.ethereum) {
+    alert("MetaMask is not installed.");
+    return;
+  }
+
+  try {
+    provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    signer = provider.getSigner();
+    currentAccount = await signer.getAddress();
+
+    walletStatus.innerText = `Connected: ${currentAccount}`;
+    walletStatus.style.backgroundColor = '#2ecc71';
+
+    connectBtn.style.display = 'none';
+    disconnectBtn.style.display = 'inline-block';
+
+    // Initialize contract with signer so we can send transactions
+    contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+
+    roleStatus.innerText = `Role: Landowner`;  // Example static role
+    roleStatus.style.display = 'block';
+
+    updateMenuByRole("Landowner");
+
+  } catch (error) {
+    walletStatus.innerText = `Connection failed: ${error.message}`;
+    walletStatus.style.backgroundColor = '#e74c3c';
+    console.error(error);
+  }
+}
+
+function disconnectWallet() {
+  currentAccount = null;
+  provider = null;
+  signer = null;
+  contract = null;
+
+  walletStatus.innerText = 'Disconnected';
+  walletStatus.style.backgroundColor = '#e67e22';
+
+  roleStatus.style.display = 'none';
+  connectBtn.style.display = 'inline-block';
+  disconnectBtn.style.display = 'none';
+  hideAllRoleMenus();
+}
+
+function updateMenuByRole(role) {
+  hideAllRoleMenus();
+
+  if (role === "Admin") {
+    document.querySelectorAll('.role-admin').forEach(el => el.style.display = 'block');
+    document.querySelectorAll('.role-landowner').forEach(el => el.style.display = 'block');
+  } else if (role === "Landowner") {
+    document.querySelectorAll('.role-landowner').forEach(el => el.style.display = 'block');
+  }
+}
+
+function hideAllRoleMenus() {
+  document.querySelectorAll('.role-admin, .role-landowner').forEach(el => el.style.display = 'none');
+}
+
+// This is the function to register land on the blockchain
+async function registerLandOnBlockchain(
+  plotId,
+  ownerName,
+  district,
+  subcounty,
+  parish,
+  village,
+  plotSize,
+  nationalNIN
+) {
+  if (!contract) {
+    alert("Connect your wallet first!");
+    return;
+  }
+
+  try {
+    const tx = await contract.registerLand(
+      plotId,
+      ownerName,
+      district,
+      subcounty,
+      parish,
+      village,
+      plotSize,
+      nationalNIN,
+      {
+        value: ethers.utils.parseEther("0.01") // Sending the required registration fee
+      }
+    );
+
+    walletStatus.innerText = "Registering land, please wait...";
+    await tx.wait();
+
+    walletStatus.innerText = "Land registered successfully!";
+  } catch (error) {
+    console.error("Registration failed:", error);
+    walletStatus.innerText = `Registration failed: ${error.message || error}`;
+  }
+}
+
+// Example: Hook the register button or form submit to call this function
+// Example usage:
+// registerBtn.addEventListener('click', () => {
+//   registerLandOnBlockchain('plot123', 'Alice', 'DistrictX', 'SubcountyY', 'ParishZ', 'VillageW', 1000, 'NIN123456');
+// });
+
+connectBtn.addEventListener('click', connectMetaMask);
+disconnectBtn.addEventListener('click', disconnectWallet);
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Land Lease Management</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #121212;
+    color: #eee;
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: #222;
+  }
+  h2 {
+    color: #6cf;
+  }
+  label {
+    display: block;
+    margin: 0.7rem 0 0.2rem;
+  }
+  input[type=text], input[type=number], input[type=date] {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 4px;
+    border: none;
+    font-size: 1rem;
+  }
+  button {
+    margin-top: 1rem;
+    background-color: #4caf50;
+    border: none;
+    color: white;
+    padding: 0.7rem 1.2rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  button:disabled {
+    background-color: #666;
+    cursor: not-allowed;
+  }
+  #status {
+    margin-top: 1rem;
+    font-weight: bold;
+  }
+  .section {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #444;
+    padding-bottom: 1.5rem;
+  }
+</style>
+</head>
+<body>
+
+<h2>Lease Land Parcel</h2>
+
+<div class="section">
+  <form id="startLeaseForm">
+    <label for="leasePlotId">Plot ID</label>
+    <input type="text" id="leasePlotId" placeholder="Enter plot ID" required />
+
+    <label for="tenantAddress">Tenant Wallet Address</label>
+    <input type="text" id="tenantAddress" placeholder="0x..." required />
+
+    <label for="leaseStartDate">Lease Start Date</label>
+    <input type="date" id="leaseStartDate" required />
+
+    <label for="leaseEndDate">Lease End Date</label>
+    <input type="date" id="leaseEndDate" required />
+
+    <button type="submit">Start Lease</button>
+  </form>
+  <div id="startLeaseStatus"></div>
+</div>
+
+<div class="section">
+  <form id="endLeaseForm">
+    <label for="endLeasePlotId">Plot ID</label>
+    <input type="text" id="endLeasePlotId" placeholder="Enter plot ID" required />
+    <button type="submit">End Lease</button>
+  </form>
+  <div id="endLeaseStatus"></div>
+</div>
+{% include 'footer.html' %}
+
+<!-- Load ethers.js library with correct CDN -->
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<script>
+  const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3"; // Update with your deployed contract address
+  const contractABI = [
+    // Minimal ABI with the functions we need
+    "function startLease(string plotId, address tenant, uint256 leaseStart, uint256 leaseEnd) public",
+    "function endLease(string plotId) public"
+  ];
+
+  async function getContract() {
+    if (!window.ethereum) {
+      alert("MetaMask is required to use this app.");
+      throw new Error("MetaMask not found");
+    }
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const signer = provider.getSigner();
+    return new ethers.Contract(contractAddress, contractABI, signer);
+  }
+
+  document.getElementById('startLeaseForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const status = document.getElementById('startLeaseStatus');
+    status.style.color = "white";
+    status.textContent = "⏳ Waiting for transaction confirmation...";
+
+    const plotId = document.getElementById('leasePlotId').value.trim();
+    const tenant = document.getElementById('tenantAddress').value.trim();
+    const leaseStartDate = document.getElementById('leaseStartDate').value;
+    const leaseEndDate = document.getElementById('leaseEndDate').value;
+
+    // Convert dates to UNIX timestamps (seconds)
+    const leaseStart = Math.floor(new Date(leaseStartDate).getTime() / 1000);
+    const leaseEnd = Math.floor(new Date(leaseEndDate).getTime() / 1000);
+
+    if (leaseEnd <= leaseStart) {
+      status.style.color = "red";
+      status.textContent = "❌ Lease end date must be after start date.";
+      return;
+    }
+
+    try {
+      const contract = await getContract();
+      const tx = await contract.startLease(plotId, tenant, leaseStart, leaseEnd);
+      await tx.wait();
+      status.style.color = "lightgreen";
+      status.textContent = "✅ Lease started successfully!";
+    } catch (err) {
+      console.error(err);
+      const message = err?.error?.message || err.message || "Transaction failed";
+      status.style.color = "red";
+      status.textContent = `❌ Error: ${message}`;
+    }
+  });
+
+  document.getElementById('endLeaseForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const status = document.getElementById('endLeaseStatus');
+    status.style.color = "white";
+    status.textContent = "⏳ Waiting for transaction confirmation...";
+
+    const plotId = document.getElementById('endLeasePlotId').value.trim();
+
+    try {
+      const contract = await getContract();
+      const tx = await contract.endLease(plotId);
+      await tx.wait();
+      status.style.color = "lightgreen";
+      status.textContent = "✅ Lease ended successfully!";
+    } catch (err) {
+      console.error(err);
+      const message = err?.error?.message || err.message || "Transaction failed";
+      status.style.color = "red";
+      status.textContent = `❌ Error: ${message}`;
+    }
+  });
+</script>
+
+</body>
+</html>

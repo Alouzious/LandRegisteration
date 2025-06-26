@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reusable Navbar</title>
+  <style>
+    /* Navbar Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    header {
+      background-color: #fff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #2c3e50;
+      text-decoration: none;
+    }
+
+    .logo span {
+      color: #3498db;
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      flex-wrap: wrap;
+    }
+
+    nav ul li {
+      position: relative;
+      margin-left: 1.5rem;
+    }
+
+    nav ul li a {
+      text-decoration: none;
+      color: #2c3e50;
+      font-weight: 500;
+      transition: color 0.3s;
+      cursor: pointer;
+      padding: 0.5rem 0;
+    }
+
+    nav ul li a:hover {
+      color: #3498db;
+    }
+
+    /* Dropdown menu */
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 40px;
+      left: 0;
+      background: white;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-radius: 6px;
+      z-index: 1000;
+      min-width: 180px;
+    }
+
+    .dropdown-menu li {
+      margin: 0;
+    }
+
+    .dropdown-menu li a {
+      display: block;
+      padding: 10px 20px;
+      color: #2c3e50;
+      text-decoration: none;
+      border-radius: 0;
+    }
+
+    .dropdown-menu li a:hover {
+      background: #f0f0f0;
+      color: #3498db;
+    }
+
+    .dropdown:hover .dropdown-menu {
+      display: block;
+    }
+
+    /* Mobile menu toggle */
+    .mobile-menu-toggle {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      padding: 0.5rem;
+    }
+
+    .mobile-menu-toggle span {
+      width: 25px;
+      height: 3px;
+      background-color: #2c3e50;
+      margin: 3px 0;
+      transition: 0.3s;
+    }
+
+    .mobile-menu-toggle.active span:nth-child(1) {
+      transform: rotate(-45deg) translate(-5px, 6px);
+    }
+
+    .mobile-menu-toggle.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .mobile-menu-toggle.active span:nth-child(3) {
+      transform: rotate(45deg) translate(-5px, -6px);
+    }
+
+    /* Role-based menu items */
+    .role-admin, .role-landowner {
+      display: none;
+    }
+
+    /* Wallet connection styles */
+    .wallet-section {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-left: 1rem;
+    }
+
+    .btn-connect {
+      padding: 0.5rem 1rem;
+      background-color: #5f00b8;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.3s;
+      white-space: nowrap;
+    }
+
+    .btn-connect:hover {
+      background-color: #440087;
+    }
+
+    #disconnectBtn {
+      background-color: #e74c3c;
+    }
+
+    #disconnectBtn:hover {
+      background-color: #c0392b;
+    }
+
+    .wallet-status {
+      font-size: 0.8rem;
+      color: #666;
+      max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .mobile-menu-toggle {
+        display: flex;
+      }
+
+      nav ul {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: white;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        flex-direction: column;
+        display: none;
+        padding: 1rem 0;
+      }
+
+      nav ul.active {
+        display: flex;
+      }
+
+      nav ul li {
+        margin: 0;
+        width: 100%;
+      }
+
+      nav ul li a {
+        display: block;
+        padding: 1rem 2rem;
+        border-bottom: 1px solid #f0f0f0;
+      }
+
+      .dropdown-menu {
+        position: static;
+        display: block;
+        box-shadow: none;
+        background: #f8f9fa;
+        margin-left: 2rem;
+      }
+
+      .dropdown:hover .dropdown-menu {
+        display: block;
+      }
+
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .wallet-section {
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 1rem;
+        margin-left: 0;
+      }
+
+      .wallet-status {
+        max-width: 200px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar Component -->
+<header id="navbar">
+  <a href="/" class="logo">Land <span>Registry</span></a>
+  
+  <div class="mobile-menu-toggle" id="mobileMenuToggle">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  
+  <nav>
+    <ul id="navMenu">
+      <li><a href="/">Home</a></li>
+
+      <!-- Only visible to Landowner and Admin -->
+      <li class="dropdown role-landowner role-admin">
+        <a href="#">Managing Land</a>
+        <ul class="dropdown-menu">
+          <li><a href="/register-land">Register Land</a></li>
+          <li><a href="/transfer-land">Transfer Land</a></li>
+          <li><a href="/lease-land">Lease Land</a></li>
+          <li><a href="/view-records">View Records</a></li>
+        </ul>
+      </li>
+
+      <!-- Only visible to Landowner -->
+      <li class="role-landowner"><a href="/split-land">Split Land</a></li>
+
+      <li><a href="/about">About</a></li>
+      <li><a href="/contact">Contact</a></li>
+      <!-- Role menu item will be dynamically inserted here -->
+    </ul>
+  </nav>
+
+  <div class="wallet-section">
+    <button class="btn-connect" id="connectBtn">Connect Wallet</button>
+    <button class="btn-connect" id="disconnectBtn" style="display:none;">Disconnect</button>
+    <div class="wallet-status" id="walletStatus">Not connected</div>
+  </div>
+</header>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<script>
+  // Navbar functionality
+  class LandRegistryNavbar {
+    constructor() {
+      this.connectBtn = document.getElementById('connectBtn');
+      this.disconnectBtn = document.getElementById('disconnectBtn');
+      this.walletStatus = document.getElementById('walletStatus');
+      this.navMenu = document.getElementById('navMenu');
+      this.mobileMenuToggle = document.getElementById('mobileMenuToggle');
+      
+      this.currentAccount = null;
+      this.provider = null;
+      this.contract = null;
+      this.roleMenuItem = null;
+      
+      // Replace with your contract's deployed address
+      this.CONTRACT_ADDRESS = "0xacad9367073a33877FE10BF5e8EDd386E70f748f";
+      
+      // Minimal ABI for getRole function
+      this.ABI = [
+        {
+          "inputs": [{"internalType": "address","name":"user","type":"address"}],
+          "name": "getRole",
+          "outputs": [{"internalType": "string","name":"","type":"string"}],
+          "stateMutability": "view",
+          "type": "function"
+        }
+      ];
+      
+      this.init();
+    }
+
+    init() {
+      this.connectBtn.addEventListener('click', () => this.connectMetaMask());
+      this.disconnectBtn.addEventListener('click', () => this.disconnectWallet());
+      this.mobileMenuToggle.addEventListener('click', () => this.toggleMobileMenu());
+      
+      // Check if already connected on page load
+      this.checkConnection();
+    }
+
+    async checkConnection() {
+      if (window.ethereum && window.ethereum.selectedAddress) {
+        await this.connectMetaMask();
+      }
+    }
+
+    async connectMetaMask() {
+      if (!window.ethereum) {
+        alert("MetaMask is not installed. Please install MetaMask to continue.");
+        return;
+      }
+
+      try {
+        this.provider = new ethers.providers.Web3Provider(window.ethereum);
+        await this.provider.send("eth_requestAccounts", []);
+        const signer = this.provider.getSigner();
+        this.currentAccount = await signer.getAddress();
+
+        const shortAddress = `${this.currentAccount.slice(0, 6)}...${this.currentAccount.slice(-4)}`;
+        this.walletStatus.innerText = shortAddress;
+        this.walletStatus.style.color = '#2ecc71';
+
+        this.connectBtn.style.display = 'none';
+        this.disconnectBtn.style.display = 'inline-block';
+
+        this.contract = new ethers.Contract(this.CONTRACT_ADDRESS, this.ABI, this.provider);
+
+        try {
+          const role = await this.contract.getRole(this.currentAccount);
+          this.updateMenuByRole(role);
+        } catch (error) {
+          console.warn("Could not fetch user role:", error);
+        }
+
+      } catch (error) {
+        this.walletStatus.innerText = 'Connection failed';
+        this.walletStatus.style.color = '#e74c3c';
+        console.error("Connection error:", error);
+      }
+    }
+
+    disconnectWallet() {
+      this.currentAccount = null;
+      this.walletStatus.innerText = 'Not connected';
+      this.walletStatus.style.color = '#666';
+
+      this.connectBtn.style.display = 'inline-block';
+      this.disconnectBtn.style.display = 'none';
+
+      this.hideAllRoleMenus();
+
+      if (this.roleMenuItem) {
+        this.roleMenuItem.remove();
+        this.roleMenuItem = null;
+      }
+    }
+
+    updateMenuByRole(role) {
+      this.hideAllRoleMenus();
+
+      if (role === "Admin") {
+        document.querySelectorAll('.role-admin').forEach(el => el.style.display = 'block');
+        document.querySelectorAll('.role-landowner').forEach(el => el.style.display = 'block');
+      } else if (role === "Landowner") {
+        document.querySelectorAll('.role-landowner').forEach(el => el.style.display = 'block');
+      }
+
+      this.addRoleMenuItem(role);
+    }
+
+    addRoleMenuItem(role) {
+      if (this.roleMenuItem) {
+        this.roleMenuItem.remove();
+        this.roleMenuItem = null;
+      }
+
+      if (!role || role === "Unknown") return;
+
+      this.roleMenuItem = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = "/dashboard";
+      link.textContent = `${role} Dashboard`;
+      link.style.color = '#3498db';
+      link.style.fontWeight = '600';
+
+      this.roleMenuItem.appendChild(link);
+      this.navMenu.appendChild(this.roleMenuItem);
+    }
+
+    hideAllRoleMenus() {
+      document.querySelectorAll('.role-admin, .role-landowner').forEach(el => el.style.display = 'none');
+    }
+
+    toggleMobileMenu() {
+      this.mobileMenuToggle.classList.toggle('active');
+      this.navMenu.classList.toggle('active');
+    }
+  }
+
+  // Initialize navbar when DOM is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    new LandRegistryNavbar();
+  });
+
+  // Export for use in other pages
+  window.LandRegistryNavbar = LandRegistryNavbar;
+</script>
+
+</body>
+</html>

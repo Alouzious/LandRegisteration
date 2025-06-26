@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reusable Footer</title>
+  <style>
+    /* Footer Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    footer {
+      background: linear-gradient(135deg, #2c3e50, #34495e);
+      color: white;
+      padding: 3rem 0 1rem;
+      margin-top: auto;
+    }
+
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .footer-section h3 {
+      color: #3498db;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .footer-section p, .footer-section li {
+      color: #bdc3c7;
+      line-height: 1.6;
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-section ul {
+      list-style: none;
+    }
+
+    .footer-section ul li a {
+      color: #bdc3c7;
+      text-decoration: none;
+      transition: color 0.3s ease;
+      display: block;
+      padding: 0.25rem 0;
+    }
+
+    .footer-section ul li a:hover {
+      color: #3498db;
+      padding-left: 0.5rem;
+    }
+
+    .company-info .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #fff;
+      margin-bottom: 1rem;
+    }
+
+    .company-info .logo span {
+      color: #3498db;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .social-links a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background: rgba(52, 152, 219, 0.2);
+      border: 2px solid #3498db;
+      border-radius: 50%;
+      color: #3498db;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-weight: bold;
+    }
+
+    .social-links a:hover {
+      background: #3498db;
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .contact-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .contact-item .icon {
+      color: #3498db;
+      font-weight: bold;
+      min-width: 20px;
+    }
+
+    .newsletter {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1.5rem;
+      border-radius: 10px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .newsletter-form {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .newsletter-form input {
+      flex: 1;
+      padding: 0.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-family: inherit;
+    }
+
+    .newsletter-form input::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .newsletter-form input:focus {
+      outline: none;
+      border-color: #3498db;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .newsletter-form button {
+      padding: 0.75rem 1.5rem;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .newsletter-form button:hover {
+      background: #2980b9;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      padding-top: 1.5rem;
+      text-align: center;
+    }
+
+    .footer-bottom-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .copyright {
+      color: #bdc3c7;
+      font-size: 0.9rem;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: #bdc3c7;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.3s ease;
+    }
+
+    .footer-links a:hover {
+      color: #3498db;
+    }
+
+    .back-to-top {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      width: 50px;
+      height: 50px;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+      opacity: 0;
+      visibility: hidden;
+      z-index: 1000;
+    }
+
+    .back-to-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .back-to-top:hover {
+      background: #2980b9;
+      transform: translateY(-2px);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .footer-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .footer-bottom-content {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .footer-links {
+        justify-content: center;
+      }
+
+      .newsletter-form {
+        flex-direction: column;
+      }
+
+      .social-links {
+        justify-content: center;
+      }
+
+      .back-to-top {
+        bottom: 1rem;
+        right: 1rem;
+        width: 45px;
+        height: 45px;
+      }
+    }
+
+    /* Animation for scroll reveal */
+    .footer-section {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.6s ease forwards;
+    }
+
+    .footer-section:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .footer-section:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    .footer-section:nth-child(4) {
+      animation-delay: 0.6s;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Footer Component -->
+<footer id="footer">
+  <div class="footer-container">
+    <div class="footer-content">
+      <!-- Company Information -->
+      <div class="footer-section company-info">
+        <div class="logo">Land <span>Registry</span></div>
+        <p>
+          Revolutionizing property ownership through blockchain technology. 
+          Secure, transparent, and immutable land records for the digital age.
+        </p>
+        <div class="social-links">
+          <a href="#" title="Twitter">T</a>
+          <a href="#" title="LinkedIn">L</a>
+          <a href="#" title="Facebook">F</a>
+          <a href="#" title="GitHub">G</a>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="footer-section">
+        <h3>Quick Links</h3>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/about">About Us</a></li>
+          <li><a href="/services">Our Services</a></li>
+          <li><a href="/how-it-works">How It Works</a></li>
+          <li><a href="/pricing">Pricing</a></li>
+          <li><a href="/contact">Contact Us</a></li>
+        </ul>
+      </div>
+
+      <!-- Services -->
+      <div class="footer-section">
+        <h3>Services</h3>
+        <ul>
+          <li><a href="{% url 'register_land' %}">Land Registration</a></li>
+          <li><a href="{% url 'transfer_land' %}">Property Transfer</a></li>
+          <li><a href="{% url 'lease_land' %}">Land Leasing</a></li>
+          <li><a href="{% url 'split_land' %}">Land Subdivision</a></li>
+          <li><a href="{% url 'view_details' %}">Records Verification</a></li>
+          <li><a href="#">API Access</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact & Newsletter -->
+      <div class="footer-section">
+        <h3>Contact Info</h3>
+        <div class="contact-info">
+          <div class="contact-item">
+            <span class="icon">📍</span>
+            <span>Innovation Hub, Tech District<br>Kampala, Uganda</span>
+          </div>
+          <div class="contact-item">
+            <span class="icon">📞</span>
+            <span>+256 700 123 456</span>
+          </div>
+          <div class="contact-item">
+            <span class="icon">✉️</span>
+            <span>info@landregistry.blockchain</span>
+          </div>
+        </div>
+        
+        <div class="newsletter">
+          <h3>Stay Updated</h3>
+          <p>Subscribe to our newsletter for the latest updates and news.</p>
+          <form class="newsletter-form" id="newsletterForm">
+            <input type="email" placeholder="Enter your email" required>
+            <button type="submit">Subscribe</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Bottom -->
+    <div class="footer-bottom">
+      <div class="footer-bottom-content">
+        <div class="copyright">
+          <p>&copy; 2025 Land Registry Blockchain. All rights reserved.</p>
+        </div>
+        <div class="footer-links">
+          <a href="/privacy-policy">Privacy Policy</a>
+          <a href="/terms-of-service">Terms of Service</a>
+          <a href="/cookie-policy">Cookie Policy</a>
+          <a href="/support">Support</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Back to Top Button -->
+  <button class="back-to-top" id="backToTop" title="Back to top">↑</button>
+</footer>
+
+<script>
+  // Footer functionality
+  class LandRegistryFooter {
+    constructor() {
+      this.backToTopBtn = document.getElementById('backToTop');
+      this.newsletterForm = document.getElementById('newsletterForm');
+      
+      this.init();
+    }
+
+    init() {
+      // Back to top functionality
+      window.addEventListener('scroll', () => this.handleScroll());
+      this.backToTopBtn.addEventListener('click', () => this.scrollToTop());
+      
+      // Newsletter form
+      this.newsletterForm.addEventListener('submit', (e) => this.handleNewsletterSubmit(e));
+      
+      // Initialize animations
+      this.initAnimations();
+    }
+
+    handleScroll() {
+      if (window.pageYOffset > 300) {
+        this.backToTopBtn.classList.add('visible');
+      } else {
+        this.backToTopBtn.classList.remove('visible');
+      }
+    }
+
+    scrollToTop() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+
+    handleNewsletterSubmit(e) {
+      e.preventDefault();
+      const email = e.target.querySelector('input[type="email"]').value;
+      
+      // Here you would typically send the email to your backend
+      alert(`Thank you for subscribing with email: ${email}`);
+      
+      // Reset form
+      e.target.reset();
+    }
+
+    initAnimations() {
+      // Intersection Observer for scroll animations
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.animationPlayState = 'running';
+          }
+        });
+      }, { threshold: 0.1 });
+
+      document.querySelectorAll('.footer-section').forEach(section => {
+        observer.observe(section);
+      });
+    }
+
+    // Method to update footer content dynamically
+    updateContactInfo(contactData) {
+      const contactInfo = document.querySelector('.contact-info');
+      if (contactInfo && contactData) {
+        contactInfo.innerHTML = `
+          <div class="contact-item">
+            <span class="icon">📍</span>
+            <span>${contactData.address || 'Innovation Hub, Tech District<br>Kampala, Uganda'}</span>
+          </div>
+          <div class="contact-item">
+            <span class="icon">📞</span>
+            <span>${contactData.phone || '+256 700 123 456'}</span>
+          </div>
+          <div class="contact-item">
+            <span class="icon">✉️</span>
+            <span>${contactData.email || 'info@landregistry.blockchain'}</span>
+          </div>
+        `;
+      }
+    }
+
+    // Method to update social links
+    updateSocialLinks(socialData) {
+      const socialLinks = document.querySelector('.social-links');
+      if (socialLinks && socialData) {
+        socialLinks.innerHTML = '';
+        Object.entries(socialData).forEach(([platform, url]) => {
+          const link = document.createElement('a');
+          link.href = url;
+          link.title = platform;
+          link.textContent = platform.charAt(0).toUpperCase();
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          socialLinks.appendChild(link);
+        });
+      }
+    }
+  }
+
+  // Initialize footer when DOM is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    new LandRegistryFooter();
+  });
+
+  // Export for use in other pages
+  window.LandRegistryFooter = LandRegistryFooter;
+</script>
+
+</body>
+</html>

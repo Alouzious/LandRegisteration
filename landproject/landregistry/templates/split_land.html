@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Split and Transfer Land</title>
+  <style>
+    body {
+      background-color: #f0f4f8;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 40px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #ffffff;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #003366;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #0066cc;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #004e99;
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #eaf6ff;
+      border-left: 5px solid #0066cc;
+      border-radius: 5px;
+      display: none;
+    }
+
+    .error {
+      background-color: #ffe6e6;
+      border-left-color: #cc0000;
+      color: #cc0000;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Split and Transfer Land</h2>
+
+    <input id="originalPlotId" placeholder="Original Plot ID">
+    <input id="newPlotId" placeholder="New Plot ID">
+    <input id="newOwnerName" placeholder="New Owner Name">
+    <input id="newNIN" placeholder="New Owner NIN">
+    <input id="newOwnerAddress" placeholder="New Owner Wallet Address">
+    <input id="splitSize" type="number" placeholder="Plot Size to Transfer">
+    <input id="privateKey" placeholder="Your Private Key">
+
+    <button onclick="splitLand()">Submit Split Transfer</button>
+
+    <div id="result" class="result"></div>
+  </div>
+{% include 'footer.html' %}
+
+  <script>
+    async function splitLand() {
+      const body = {
+        originalPlotId: document.getElementById('originalPlotId').value.trim(),
+        newPlotId: document.getElementById('newPlotId').value.trim(),
+        newOwnerName: document.getElementById('newOwnerName').value.trim(),
+        newNIN: document.getElementById('newNIN').value.trim(),
+        newOwnerAddress: document.getElementById('newOwnerAddress').value.trim(),
+        splitSize: document.getElementById('splitSize').value.trim(),
+        senderPrivateKey: document.getElementById('privateKey').value.trim()
+      };
+
+      const resultDiv = document.getElementById('result');
+      resultDiv.style.display = 'block';
+      resultDiv.classList.remove('error');
+      resultDiv.innerHTML = 'Processing... Please wait.';
+
+      try {
+        const res = await fetch('/api/split-land/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+
+        const data = await res.json();
+
+        if (data.status === "success") {
+          resultDiv.innerHTML = `<strong>Success!</strong><br>Transaction Hash: <code>${data.txHash}</code>`;
+        } else {
+          resultDiv.classList.add('error');
+          resultDiv.innerHTML = `<strong>Error:</strong> ${data.message || 'Something went wrong'}`;
+        }
+      } catch (err) {
+        resultDiv.classList.add('error');
+        resultDiv.innerHTML = `<strong>Fetch Error:</strong> ${err.message}`;
+      }
+    }
+  </script>
+</body>
+</html>
